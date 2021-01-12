@@ -3,6 +3,7 @@ import 'package:flutter_application_qr/screen/scan.dart';
 
 
 void main(){
+  
   runApp(MaterialApp(
     home: MyApp(),
   ));

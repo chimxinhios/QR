@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/services.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:last_qr_scanner/last_qr_scanner.dart';
 import 'shared_preferences_manager.dart';
 import 'package:audioplayers/audioplayers.dart';
@@ -9,6 +8,7 @@ import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter_application_qr/bloc/flat_card_bloc.dart';
 import 'package:flutter_application_qr/models/ketqua.dart';
 import 'package:flutter_application_qr/screen/book.dart';
+import 'package:connectivity/connectivity.dart';
 
 class Scan extends StatefulWidget {
   @override
@@ -22,7 +22,7 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   List<String> list = [];
   List<KetQua> listResult = new List();
   List test;
-
+  bool internet = true;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
   var qrText = "";
   var controller;
@@ -67,9 +67,23 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
       switch (call.method) {
         case "onRecognizeQR":
           dynamic arguments = call.arguments;
-          setState(() {
-            qrText = arguments.toString();
-          });
+          // setState(() {
+
+          if (qrText.length > 0 && qrText != qrTextCache) {
+            bloc.getApi(qrText);
+            qrTextCache = qrText;
+          }
+          print("onrecognize $arguments");
+          qrText = arguments.toString();
+          if (check() == true) {
+            bloc.getApi(qrText);
+            qrTextCache = qrText;
+          }
+        // if (internet == false) {
+        //   bloc.getApi(qrText);
+        //   qrTextCache = qrText;
+        // }
+        //});
       }
     });
   }
@@ -215,51 +229,17 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
         stream: bloc.stream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
+            internet = false;
             print(snapshot.error);
-            //bloc.dispose();
+            new Future.delayed(Duration(seconds: 0), () {
+              Scaffold.of(context).showSnackBar(SnackBar(
+                content: Text(snapshot.error),
+              ));
+            });
 
-            // new Future.delayed(Duration(seconds: 3), () {
-            //  Scaffold.of(context).showSnackBar(SnackBar(
-            //    content: Text(snapshot.error),
-            //   ));
-            // });
-
-            // Fluttertoast.showToast(
-            //     msg: "This is Toast messaget",
-            //     toastLength: Toast.LENGTH_SHORT,
-            //     gravity: ToastGravity.CENTER,
-            //     );
-            return Container(
-              //height: 100,
-              // color: Colors.blue,
-              padding: EdgeInsets.fromLTRB(22, 10, 22, 0),
-              child: FlatButton(
-                color: Colors.white,
-                child: Flexible(
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: [
-                      Icon(Icons.warning,color: Colors.red,),
-                      Flexible(
-                                              child: Container(
-                          child: Text(
-                            
-                            snapshot.error,
-                            //maxLines: null,
-                            overflow: TextOverflow.ellipsis,
-                            style: TextStyle(color: Colors.blue, fontSize: 22),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-                onPressed: () {},
-                shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18.0),
-                    side: BorderSide(color: Colors.red)),
-              ),
-            );
+            // return Container(
+            //   child: Text(snapshot.error),
+            // );
           }
 
           if (!snapshot.hasData) {
@@ -373,10 +353,10 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   }
 
   Widget onCam() {
-    if (qrText.length > 0 && qrText != qrTextCache) {
-      bloc.getApi(qrText);
-      qrTextCache = qrText;
-    }
+    // if (qrText.length > 0 && qrText != qrTextCache) {
+    //   bloc.getApi(qrText);
+    //   qrTextCache = qrText;
+    // }
     return Container(
       color: Colors.white,
       height: 280,
@@ -405,5 +385,27 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
       ]),
       //flex: 4,
     );
+  }
+
+  Future<bool> check() async {
+    var connectivityResult = await (Connectivity().checkConnectivity());
+    if (connectivityResult == ConnectivityResult.mobile) {
+      print("internet mobile");
+      return true;
+    } else if (connectivityResult == ConnectivityResult.wifi) {
+      print("internet wifi");
+      return true;
+    }
+    return false;
+  }
+
+  dynamic checkInternet(Function func) {
+    check().then((intenet) {
+      if (intenet != null && intenet) {
+        func(true);
+      } else {
+        func(false);
+      }
+    });
   }
 }
