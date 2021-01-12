@@ -240,10 +240,16 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
                     mainAxisAlignment: MainAxisAlignment.spaceAround,
                     children: [
                       Icon(Icons.warning,color: Colors.red,),
-                      Text(
-                        snapshot.error,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(color: Colors.blue, fontSize: 22),
+                      Flexible(
+                                              child: Container(
+                          child: Text(
+                            
+                            snapshot.error,
+                            //maxLines: null,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(color: Colors.blue, fontSize: 22),
+                          ),
+                        ),
                       ),
                     ],
                   ),
