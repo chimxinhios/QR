@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
 import 'package:last_qr_scanner/last_qr_scanner.dart';
 import 'shared_preferences_manager.dart';
@@ -8,7 +9,6 @@ import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter_application_qr/bloc/flat_card_bloc.dart';
 import 'package:flutter_application_qr/models/ketqua.dart';
 import 'package:flutter_application_qr/screen/book.dart';
-import 'package:connectivity/connectivity.dart';
 
 class Scan extends StatefulWidget {
   @override
@@ -24,9 +24,9 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   List test;
   bool internet = true;
   final GlobalKey qrKey = GlobalKey(debugLabel: 'QR');
-  var qrText = "";
+  var qrText = "nil";
   var controller;
-  var qrTextCache = "nil";
+  var qrTextCache = "";
 
   AudioPlayer audioPlayer = new AudioPlayer();
   @override
@@ -54,7 +54,6 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   @override
   void dispose() {
     print('dispose');
-    bloc.dispose();
     super.dispose();
     WidgetsBinding.instance.removeObserver(this);
   }
@@ -67,22 +66,19 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
       switch (call.method) {
         case "onRecognizeQR":
           dynamic arguments = call.arguments;
-          // setState(() {
 
-          if (qrText.length > 0 && qrText != qrTextCache) {
+          //setState(() {
+            qrText = arguments.toString();
+          if (qrText.length > 0 && qrText != qrTextCache && internet == true) {
             bloc.getApi(qrText);
             qrTextCache = qrText;
           }
-          print("onrecognize $arguments");
-          qrText = arguments.toString();
-          if (check() == true) {
-            bloc.getApi(qrText);
-            qrTextCache = qrText;
-          }
-        // if (internet == false) {
-        //   bloc.getApi(qrText);
-        //   qrTextCache = qrText;
-        // }
+          check();
+          //internet = check() as bool;
+          // if (internet == true) {
+            
+          //}
+
         //});
       }
     });
@@ -229,7 +225,6 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
         stream: bloc.stream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            internet = false;
             print(snapshot.error);
             new Future.delayed(Duration(seconds: 0), () {
               Scaffold.of(context).showSnackBar(SnackBar(
@@ -246,10 +241,10 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
             return huongDan();
           }
           final result = snapshot.data;
-          // new Future.delayed(Duration(seconds: 1), () {
-          //   // controller.resumeScanner();
-          //   //audioPlayer.play(result.audio);
-          // });
+          new Future.delayed(Duration(seconds: 1), () {
+            // controller.resumeScanner();
+            //audioPlayer.play(result.audio);
+          });
           audioPlayer.play(result.audio);
           //controller.pauseScanner();
           // qrResult = snapshot.data;
@@ -390,22 +385,13 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   Future<bool> check() async {
     var connectivityResult = await (Connectivity().checkConnectivity());
     if (connectivityResult == ConnectivityResult.mobile) {
-      print("internet mobile");
+      internet = true;
       return true;
     } else if (connectivityResult == ConnectivityResult.wifi) {
-      print("internet wifi");
+      internet = true;
       return true;
     }
+    internet = false;
     return false;
-  }
-
-  dynamic checkInternet(Function func) {
-    check().then((intenet) {
-      if (intenet != null && intenet) {
-        func(true);
-      } else {
-        func(false);
-      }
-    });
   }
 }
