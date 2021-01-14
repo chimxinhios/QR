@@ -9,6 +9,7 @@ import 'package:barcode_scan/barcode_scan.dart';
 import 'package:flutter_application_qr/bloc/flat_card_bloc.dart';
 import 'package:flutter_application_qr/models/ketqua.dart';
 import 'package:flutter_application_qr/screen/book.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Scan extends StatefulWidget {
   @override
@@ -32,10 +33,20 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   @override
   void initState() {
     // TODO: implement initState
+    permission();
     print('init');
     sharedPreferencesManager.init();
     super.initState();
     WidgetsBinding.instance.addObserver(this);
+  }
+
+  void permission() async {
+    if (await Permission.camera.request().isGranted) {}
+
+    Map<Permission, PermissionStatus> statuses = await [
+      Permission.camera,
+    ].request();
+    print(statuses[Permission.location]);
   }
 
   @override
@@ -68,30 +79,18 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
           dynamic arguments = call.arguments;
 
           //setState(() {
-            qrText = arguments.toString();
+          qrText = arguments.toString();
           if (qrText.length > 0 && qrText != qrTextCache && internet == true) {
             bloc.getApi(qrText);
             qrTextCache = qrText;
           }
           check();
-          //internet = check() as bool;
-          // if (internet == true) {
-            
-          //}
-
-        //});
       }
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    // var data = sharedPreferencesManager.getString('key');
-
-    //print(data);
-
-    // test = jsonDecode(data);
-    // print(test.length);
     Size size = MediaQuery.of(context).size;
     return Scaffold(
       appBar: myAppBar(),
@@ -201,7 +200,8 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
           // bloc.getApi(scanning);
         },
         child: Container(
-          height: sizeHD.height / 4,
+          height: sizeHD.height*0.22,
+          width: sizeHD.width,
           color: Colors.white,
           //margin: EdgeInsets.fromLTRB(1, 11, 1, 11),
           padding: EdgeInsets.all(16),
@@ -352,10 +352,11 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
     //   bloc.getApi(qrText);
     //   qrTextCache = qrText;
     // }
+    Size size = MediaQuery.of(context).size;
     return Container(
       color: Colors.white,
-      height: 280,
-      width: 280,
+      height: size.width*0.7,
+      width: size.width,
       margin: EdgeInsets.fromLTRB(0, 0, 0, 33),
       padding: EdgeInsets.all(8),
       child: Stack(children: [
@@ -366,6 +367,7 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
             )
             //Image.asset("assets/QR_EN-231x300.png")
             ),
+          
         LastQrScannerPreview(
           key: qrKey,
           onQRViewCreated: _onQRViewCreated,
@@ -391,6 +393,7 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
       internet = true;
       return true;
     }
+    
     internet = false;
     return false;
   }

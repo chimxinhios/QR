@@ -29,6 +29,7 @@ dependencies:
   last_qr_scanner: ^0.0.7
   fluttertoast: ^7.1.6
   connectivity: ^2.0.2
+  permission_handler: ^5.0.1+1
   # barcode_scan: ^0.0.4
   # qr_flutter: ^1.1.5
   # audioplayers: ^0.17.1

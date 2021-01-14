@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
-import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_application_qr/models/ketqua.dart';
 import 'package:flutter_application_qr/screen/shared_preferences_manager.dart';
 import 'package:http/http.dart' as http;
@@ -18,7 +17,7 @@ class FlatCardBloc {
   void dispose() {
     _streamController.close();
   }
-
+ 
   List list = new List();
   bool checkList = false;
   getApi(qrScanning) async {
@@ -57,7 +56,7 @@ class FlatCardBloc {
             print('Response status: ${response.statusCode}');
             final json = jsonDecode(response.body);
             final Kq = KetQua.fromJson(json);
-            print("Day la ket qua : ${Kq.word.length}");
+           // print("Day la ket qua : ${Kq.word.length}");
             if (Kq.word.length < 1) {
               sink.addError('Vui lòng thử lại');
             } else {
