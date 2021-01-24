@@ -28,6 +28,9 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   var qrText = "nil";
   var controller;
   var qrTextCache = "";
+  bool offCam = false;
+  String hd = " An vao day de quet";
+  String resultText = "";
 
   AudioPlayer audioPlayer = new AudioPlayer();
   @override
@@ -41,12 +44,11 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   }
 
   void permission() async {
-    if (await Permission.camera.request().isGranted) {}
-
+    //if (await Permission.camera.request().isGranted) {}
     Map<Permission, PermissionStatus> statuses = await [
       Permission.camera,
     ].request();
-    print(statuses[Permission.location]);
+    print(statuses[Permission.camera]);
   }
 
   @override
@@ -79,12 +81,25 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
           dynamic arguments = call.arguments;
 
           //setState(() {
-          qrText = arguments.toString();
-          if (qrText.length > 0 && qrText != qrTextCache && internet == true) {
-            bloc.getApi(qrText);
-            qrTextCache = qrText;
-          }
           check();
+          if (internet == false) {
+            hd = "bat wifi len";
+            //new Future.delayed(Duration(seconds: 0), () {
+            // Scaffold.of(context).showSnackBar(SnackBar(
+            //   content: Text("bat wifi len"),
+            // ));
+            // });
+          }
+          qrText = arguments.toString();
+          print("qr text is : $qrText");
+          controller.pauseScanner();
+          if (qrText.length > 0) {
+            bloc.getApi(qrText.replaceAll("\\s\\s+", " ").trim());
+            setState(() {
+              offCam = true;
+            });
+            print("is here");
+          }
       }
     });
   }
@@ -100,15 +115,12 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
         width: double.infinity,
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
-          //crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            //Text("$qrText"),
             onCam(),
             resultButton(),
             SizedBox(
               height: 20,
             ),
-            // scanButton()
           ],
         ),
       ),
@@ -119,7 +131,6 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
           color: Colors.blue,
         ),
         onPressed: () {
-          // setState(() {});
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -190,8 +201,38 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
     );
   }
 
-  Widget huongDan() {
+  Widget huongDan(resultText) {
     Size sizeHD = MediaQuery.of(context).size;
+    if (resultText.length > 0) {
+      return ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: GestureDetector(
+          onTap: () async {
+            // String scanning = await BarcodeScanner.scan();
+            // bloc.getApi(scanning);
+          },
+          child: Container(
+            height: sizeHD.height * 0.15,
+            width: sizeHD.width,
+            color: Colors.white,
+            //margin: EdgeInsets.fromLTRB(1, 11, 1, 11),
+            padding: EdgeInsets.all(16),
+            child: Container(
+              width: sizeHD.height / 2,
+              child: Center(
+                child: Text(
+                  resultText,
+                  style: TextStyle(
+                      color: Colors.blue,
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ),
+        ),
+      );
+    }
     return ClipRRect(
       borderRadius: BorderRadius.circular(16),
       child: GestureDetector(
@@ -200,18 +241,18 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
           // bloc.getApi(scanning);
         },
         child: Container(
-          height: sizeHD.height*0.22,
+          height: sizeHD.height * 0.23,
           width: sizeHD.width,
           color: Colors.white,
           //margin: EdgeInsets.fromLTRB(1, 11, 1, 11),
-          padding: EdgeInsets.all(16),
+          padding: EdgeInsets.all(12),
           child: Container(
             width: sizeHD.height / 2,
             child: Text(
-              "B1 : Nhấn vào biểu tượng scan hoặc ô này \n\n" +
-                  "B2 : Đưa máy quay về mã QR\n" +
-                  "(Di chuyển nhẹ camera nếu thiết bị không nhận dạng được mã QR)",
-              style: TextStyle(color: Colors.blue, fontSize: 15),
+              " - Đưa máy quay về mã QR\n" +
+                  "(Di chuyển nhẹ camera nếu thiết bị không nhận dạng được mã QR)\n\n" +
+                  " - Ấn vào ô Camera phía trên để mở lại camera",
+              style: TextStyle(color: Colors.blue, fontSize: 16),
             ),
           ),
         ),
@@ -220,32 +261,29 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
   }
 
   resultButton() {
-    //Size sideResultButton = MediaQuery.of(context).size;
     return StreamBuilder<KetQua>(
         stream: bloc.stream,
         builder: (context, snapshot) {
           if (snapshot.hasError) {
-            print(snapshot.error);
-            new Future.delayed(Duration(seconds: 0), () {
-              Scaffold.of(context).showSnackBar(SnackBar(
-                content: Text(snapshot.error),
-              ));
-            });
-
-            // return Container(
-            //   child: Text(snapshot.error),
-            // );
+            resultText = snapshot.error;
+            // print(snapshot.error);
+            // new Future.delayed(Duration(seconds: 5), () {
+            //   Scaffold.of(context).showSnackBar(SnackBar(
+            //     content: Text(snapshot.error),
+            //   ));
+            // });
           }
 
           if (!snapshot.hasData) {
-            return huongDan();
+            return huongDan(resultText);
           }
           final result = snapshot.data;
-          new Future.delayed(Duration(seconds: 1), () {
-            // controller.resumeScanner();
-            //audioPlayer.play(result.audio);
-          });
-          audioPlayer.play(result.audio);
+          resultText = result.word;
+          // new Future.delayed(Duration(seconds: 1), () {
+          //   // controller.resumeScanner();
+          //   //audioPlayer.play(result.audio);
+          // });
+          //audioPlayer.play(result.audio);
           //controller.pauseScanner();
           // qrResult = snapshot.data;
           return Container(
@@ -263,7 +301,7 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
                   ),
                   Flexible(
                     child: Text(
-                      result.word,
+                      snapshot.error == true ? snapshot.error : result.word,
                       overflow: TextOverflow.ellipsis,
                       style: TextStyle(color: Colors.blue, fontSize: 22),
                     ),
@@ -297,16 +335,22 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
                 SizedBox(
                   height: 12,
                 ),
-                Text("B1 : Nhấn vào nút scan"),
+                
+                Text("B1 : Đưa máy quay về mã QR",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
                 SizedBox(
-                  height: 8,
-                ),
-                Text("B2 : Đưa máy quay về mã QR"),
-                SizedBox(
-                  height: 8,
+                  height: 12,
                 ),
                 Text(
-                    "(Di chuyển nhẹ camera nếu thiết bị không nhận dạng được mã QR)")
+                    "(Di chuyển nhẹ camera nếu thiết bị không nhận dạng được mã QR)",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                    
+                SizedBox(
+                  height: 12,
+                ),
+                Text("B2 : Ấn vào từ vừa tìm thấy để nghe lại từ",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                  SizedBox(
+                  height: 12,
+                ),
+                Text("B3 : Ấn vào ô camera để mở lại camera",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
               ],
             ),
           ),
@@ -354,34 +398,42 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
     // }
     Size size = MediaQuery.of(context).size;
     return Container(
-      color: Colors.white,
-      height: size.width*0.7,
-      width: size.width,
-      margin: EdgeInsets.fromLTRB(0, 0, 0, 33),
-      padding: EdgeInsets.all(8),
-      child: Stack(children: [
-        ClipRRect(
-            borderRadius: BorderRadius.circular(15.0),
-            child: Image.asset(
-              "assets/istockphoto1024x1024.jpg",
-            )
-            //Image.asset("assets/QR_EN-231x300.png")
-            ),
-          
-        LastQrScannerPreview(
-          key: qrKey,
-          onQRViewCreated: _onQRViewCreated,
-        ),
-        Center(
-          child: Icon(
-            Icons.add,
-            size: 50,
-            color: Colors.white,
-          ),
-        )
-      ]),
-      //flex: 4,
-    );
+        color: Colors.white,
+        height: size.width * 0.7,
+        width: size.width,
+        margin: EdgeInsets.fromLTRB(0, 0, 0, 33),
+        //padding: EdgeInsets.all(8),
+        child: camera()
+        // Stack(children: [
+        // ClipRRect(
+        //     borderRadius: BorderRadius.circular(15.0),
+        //     child: Image.asset(
+        //       "assets/istockphoto1024x1024.jpg",
+        //     )
+        //     //Image.asset("assets/QR_EN-231x300.png")
+        //     ),
+        // ,
+        // Center(
+        //   child: GestureDetector(
+        //     onTap: () {
+        //       setState(() {
+        //         if (doiCam == false) {
+        //           doiCam = true;
+        //         } else {
+        //           doiCam = false;
+        //         }
+        //       });
+        //     },
+        //     child: Container(
+        //       height: double.infinity,
+        //       width: double.infinity,
+        //       color: Colors.white,
+        //     ),
+        //   ),
+        // )
+        //]),
+        //flex: 4,
+        );
   }
 
   Future<bool> check() async {
@@ -393,8 +445,78 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
       internet = true;
       return true;
     }
-    
+
     internet = false;
     return false;
+  }
+
+  Widget camera() {
+    Size size = MediaQuery.of(context).size;
+    var siz = size.width * 0.8;
+    if (offCam == true) {
+      return GestureDetector(
+        onTap: () async {
+          // await check();
+          // if (internet == true) {
+          setState(() {
+            offCam = false;
+            controller.resumeScanner();
+          });
+          //}
+          //  else {
+          //   setState(() {
+          //     new Future.delayed(Duration(seconds: 0), () {
+          //       Scaffold.of(context).showSnackBar(SnackBar(
+          //         content: Text("bat wifi len"),
+          //       ));
+          //     });
+          //   });
+          // }
+        },
+        // child: Container(
+        // height: double.infinity,
+        // width: double.infinity,
+        // color: Colors.white,
+        child: ClipRRect(
+          borderRadius: BorderRadius.circular(15.0),
+          child: Stack(children: [
+            Center(
+              child: Image.asset(
+                "assets/scan-icon.jpg",
+              ),
+            ),
+            Center(
+                child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                Text("  "),
+                Icon(
+                  Icons.camera,
+                  size: siz * 0.4,
+                ),
+                Text("Ấn vào đây để quét lại",
+                    style: TextStyle(fontSize: 19, color: Colors.blue[700]))
+              ],
+            )),
+          ]),
+        ),
+        //),
+      );
+    }
+    return Stack(
+      children: [
+        LastQrScannerPreview(
+          key: qrKey,
+          onQRViewCreated: _onQRViewCreated,
+        ),
+        Center(
+          child: Icon(
+            Icons.add,
+            size: 55,
+            color: Colors.white,
+          ),
+        )
+      ],
+    );
   }
 }

@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 import 'dart:core';
 import 'dart:io';
+import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter_application_qr/models/ketqua.dart';
 import 'package:flutter_application_qr/screen/shared_preferences_manager.dart';
 import 'package:http/http.dart' as http;
@@ -10,16 +11,17 @@ class FlatCardBloc {
   StreamController _streamController = new StreamController();
   StreamSink<KetQua> get sink => _streamController.sink;
   Stream<KetQua> get stream => _streamController.stream;
-  String baseUrl = "http://flashcard.mcbooksapp.com/api/";
+  String baseUrl = "https://flashcard.mcbooksapp.com/api/";
   FlatCardBloc() {
     _streamController = StreamController<KetQua>.broadcast();
   }
   void dispose() {
     _streamController.close();
   }
- 
+
   List list = new List();
   bool checkList = false;
+  AudioPlayer audioPlayer = new AudioPlayer();
   getApi(qrScanning) async {
     print("get API");
     try {
@@ -56,10 +58,20 @@ class FlatCardBloc {
             print('Response status: ${response.statusCode}');
             final json = jsonDecode(response.body);
             final Kq = KetQua.fromJson(json);
-           // print("Day la ket qua : ${Kq.word.length}");
+          
+            
+            // print("Day la ket qua : ${Kq.word.length}");
             if (Kq.word.length < 1) {
+              print("add err");
               sink.addError('Vui lòng thử lại');
             } else {
+                audioPlayer.play(Kq.audio);
+            new Future.delayed(Duration(seconds: 3), () {
+              audioPlayer.play(Kq.audio);
+              new Future.delayed(Duration(seconds: 3), () {
+                audioPlayer.play(Kq.audio);
+              });
+            });
               sink.add(Kq);
               print(Kq.toJson());
               if (list == null) {

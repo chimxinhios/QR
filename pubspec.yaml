@@ -15,7 +15,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # In iOS, build-name is used as CFBundleShortVersionString while build-number used as CFBundleVersion.
 # Read more about iOS versioning at
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
-version: 1.0.0+1
+version: 1.0.3
 
 environment:
   sdk: ">=2.7.0 <3.0.0"
@@ -30,6 +30,8 @@ dependencies:
   fluttertoast: ^7.1.6
   connectivity: ^2.0.2
   permission_handler: ^5.0.1+1
+  flutter_launcher_icons: ^0.8.1
+  flutter_launcher_name: ^0.0.1
   # barcode_scan: ^0.0.4
   # qr_flutter: ^1.1.5
   # audioplayers: ^0.17.1
@@ -42,7 +44,14 @@ dev_dependencies:
   flutter_test:
     sdk: flutter
   barcode_scan: ^2.0.1
+  
+flutter_icons:
+  android: "launcher_icon"
+  ios: true
+  image_path: "assets/icon.png" 
 
+flutter_launcher_name:
+  name: "MCBooks Flashcard"
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
 
@@ -56,8 +65,7 @@ flutter:
 
   # To add assets to your application, add an assets section, like this:
   assets:
-    - assets/test.mp3
-    - assets/QR_EN-231x300.png
+    - assets/scan-icon.jpg
     - assets/istockphoto1024x1024.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
