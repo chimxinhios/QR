@@ -29,31 +29,13 @@ class FlatCardBloc {
 
       if (result.isNotEmpty && result[0].rawAddress.isNotEmpty) {
         new Future.delayed(Duration(seconds: 0), () async {
-          // final result2 = await InternetAddress.lookup(url);
-          // if (result2.isNotEmpty && result2[0].rawAddress.isNotEmpty) {
-          //   print("object");
-          // } else {
-          //   print("a");
 
-          // }
-          // if (await http.get(baseUrl) == false) {
-          //   print('null');
-          // }
-          var response = await http.get(baseUrl + qrScanning)
-              // .timeout(
-              //   Duration(seconds: 3),
-              //   onTimeout: () {
-              //    // return false;
-              //   },
-              //)
-              ;
-          print("headers : ${response.statusCode}");
+          var response = await http.get(baseUrl + qrScanning);       
           var data = sharedPreferencesManager.getString('key');
           print(data.length);
           if (data.length > 0) {
             list = jsonDecode(data);
           }
-          //print('a ; ${list.length}');
           if (response.statusCode > 199 && response.statusCode < 300) {
             print('Response status: ${response.statusCode}');
             final json = jsonDecode(response.body);
@@ -75,11 +57,7 @@ class FlatCardBloc {
               sink.add(Kq);
               print(Kq.toJson());
               if (list == null) {
-                print('list nil');
                 list.add(Kq);
-
-                print('list nil2');
-
                 sharedPreferencesManager.save('key', list);
                 print('add list');
               } else if (list != null) {
@@ -92,7 +70,6 @@ class FlatCardBloc {
                 if (checkList == false) {
                   if (list.length < 20) {
                     list.add(Kq);
-                    print('add list1');
                     sharedPreferencesManager.save('key', list);
                   } else {
                     list.removeAt(1);
