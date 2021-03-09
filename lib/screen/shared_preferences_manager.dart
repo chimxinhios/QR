@@ -38,12 +38,7 @@ class SharedPreferencesManager {
 		final value = _prefs?.getString(key);
 		return value ?? '';
 	}
-	
-	/// Account
-	// Account getAccount() {
-	// 	final value = _prefs?.getString(accountKey);
-	// 	return value == null ? null : Account.fromJson(jsonDecode(value));
-	// }
+
 }
 
 final SharedPreferencesManager sharedPreferencesManager = SharedPreferencesManager();

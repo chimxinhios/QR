@@ -40,8 +40,8 @@
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
 	<key>UIViewControllerBasedStatusBarAppearance</key>
+	<false/>
 	<key>NSCameraUsageDescription</key>
     <string>Using the camera for Qr Scanner</string>
-	<false/>
 </dict>
 </plist>

@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_application_qr/screen/shared_preferences_manager.dart';
 
 class ListWord extends StatefulWidget {
-  //ListWord({Key key, this.list});
-
   @override
   _ListWordState createState() => _ListWordState();
 }
@@ -31,11 +29,7 @@ class _ListWordState extends State<ListWord> {
       var data2 = jsonDecode(data);
       list = data2;
     }
-    //print(list[0]);
 
-    // var b = KetQua.fromJson(data2[0]);
-    // print('audio' + b.audio);
-    // print('data book ' + b.word);
     return Scaffold(
       appBar: AppBar(
         //automaticallyImplyLeading: false,

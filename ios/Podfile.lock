@@ -1,0 +1,70 @@
+PODS:
+  - audioplayers (0.0.1):
+    - Flutter
+  - barcode_scan (0.0.1):
+    - Flutter
+    - MTBBarcodeScanner
+  - connectivity (0.0.1):
+    - Flutter
+    - Reachability
+  - Flutter (1.0.0)
+  - last_qr_scanner (0.0.5):
+    - Flutter
+    - MTBBarcodeScanner
+  - MTBBarcodeScanner (5.0.11)
+  - path_provider (0.0.1):
+    - Flutter
+  - "permission_handler (5.0.1+1)":
+    - Flutter
+  - Reachability (3.2)
+  - shared_preferences (0.0.1):
+    - Flutter
+
+DEPENDENCIES:
+  - audioplayers (from `.symlinks/plugins/audioplayers/ios`)
+  - barcode_scan (from `.symlinks/plugins/barcode_scan/ios`)
+  - connectivity (from `.symlinks/plugins/connectivity/ios`)
+  - Flutter (from `Flutter`)
+  - last_qr_scanner (from `.symlinks/plugins/last_qr_scanner/ios`)
+  - path_provider (from `.symlinks/plugins/path_provider/ios`)
+  - permission_handler (from `.symlinks/plugins/permission_handler/ios`)
+  - shared_preferences (from `.symlinks/plugins/shared_preferences/ios`)
+
+SPEC REPOS:
+  trunk:
+    - MTBBarcodeScanner
+    - Reachability
+
+EXTERNAL SOURCES:
+  audioplayers:
+    :path: ".symlinks/plugins/audioplayers/ios"
+  barcode_scan:
+    :path: ".symlinks/plugins/barcode_scan/ios"
+  connectivity:
+    :path: ".symlinks/plugins/connectivity/ios"
+  Flutter:
+    :path: Flutter
+  last_qr_scanner:
+    :path: ".symlinks/plugins/last_qr_scanner/ios"
+  path_provider:
+    :path: ".symlinks/plugins/path_provider/ios"
+  permission_handler:
+    :path: ".symlinks/plugins/permission_handler/ios"
+  shared_preferences:
+    :path: ".symlinks/plugins/shared_preferences/ios"
+
+SPEC CHECKSUMS:
+  audioplayers: 84f968cea3f2deab00ec4f8ff53358b3c0b3992c
+  barcode_scan: 33f586d02270046fc6559135038b34b5754eaa4f
+  connectivity: c4130b2985d4ef6fd26f9702e886bd5260681467
+  Flutter: 0e3d915762c693b495b44d77113d4970485de6ec
+  last_qr_scanner: 078afe75735f7850c4f3f2b38425b6a96c40342d
+  MTBBarcodeScanner: f453b33c4b7dfe545d8c6484ed744d55671788cb
+  path_provider: abfe2b5c733d04e238b0d8691db0cfd63a27a93c
+  permission_handler: eac8e15b4a1a3fba55b761d19f3f4e6b005d15b6
+  Reachability: 33e18b67625424e47b6cde6d202dce689ad7af96
+  shared_preferences: af6bfa751691cdc24be3045c43ec037377ada40d
+
+PODFILE CHECKSUM: 26f3d84c57ac9c3b4b7f03ca471947153740400f
+
+COCOAPODS: 1.10.1
