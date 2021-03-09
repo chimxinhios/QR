@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:connectivity/connectivity.dart';
 import 'package:flutter/services.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:last_qr_scanner/last_qr_scanner.dart';
+import 'package:open_app_settings/open_app_settings.dart';
 import 'shared_preferences_manager.dart';
 import 'package:audioplayers/audioplayers.dart';
 import 'package:flutter/material.dart';
@@ -49,6 +51,9 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
       Permission.camera,
     ].request();
     print(statuses[Permission.camera]);
+      if (statuses[Permission.camera] == PermissionStatus.denied) {
+      _showAlertGotoSetting();
+    }
   }
 
   @override
@@ -131,6 +136,7 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
           color: Colors.blue,
         ),
         onPressed: () {
+          
           Navigator.push(
               context,
               MaterialPageRoute(
@@ -267,6 +273,7 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
           if (snapshot.hasError) {
             resultText = snapshot.error;
             // print(snapshot.error);
+            
             // new Future.delayed(Duration(seconds: 5), () {
             //   Scaffold.of(context).showSnackBar(SnackBar(
             //     content: Text(snapshot.error),
@@ -335,22 +342,31 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
                 SizedBox(
                   height: 12,
                 ),
-                
-                Text("B1 : Đưa máy quay về mã QR",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                Text(
+                  "B1 : Đưa máy quay về mã QR",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
                 SizedBox(
                   height: 12,
                 ),
                 Text(
-                    "(Di chuyển nhẹ camera nếu thiết bị không nhận dạng được mã QR)",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
-                    
+                  "(Di chuyển nhẹ camera nếu thiết bị không nhận dạng được mã QR)",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
                 SizedBox(
                   height: 12,
                 ),
-                Text("B2 : Ấn vào từ vừa tìm thấy để nghe lại từ",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
-                  SizedBox(
+                Text(
+                  "B2 : Ấn vào từ vừa tìm thấy để nghe lại từ",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
+                SizedBox(
                   height: 12,
                 ),
-                Text("B3 : Ấn vào ô camera để mở lại camera",style: TextStyle(fontSize: 15,fontWeight: FontWeight.bold),),
+                Text(
+                  "B3 : Ấn vào ô camera để mở lại camera",
+                  style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold),
+                ),
               ],
             ),
           ),
@@ -519,4 +535,41 @@ class _ScanState extends State<Scan> with WidgetsBindingObserver {
       ],
     );
   }
+    Future<void> _showAlertGotoSetting() async {
+    return showDialog(
+      context: context,
+      barrierDismissible: true,
+      builder: (context) {
+        return AlertDialog(
+          title: Text("Hướng Dẫn"),
+          content: SingleChildScrollView(
+            child: ListBody(
+              children: [
+                SizedBox(
+                  height: 12,
+                ),
+                Text("Vui lòng cấp phép Camera để sử dụng ứng dụng"),
+                SizedBox(
+                  height: 8,
+                ),
+                Text("Vào Cài đặt -> MCbooks FlashCard -> cấp quyền cho Camera")
+              ],
+            ),
+          ),
+          actions: [
+            TextButton(
+                onPressed: () async {
+                  await OpenAppSettings.openAppSettings();
+                  //Navigator.of(context).pop();
+                },
+                child: Text(
+                  "Vào cài đặt ",
+                  style: TextStyle(fontSize: 15),
+                ))
+          ],
+        );
+      },
+    );
+  }
+
 }
